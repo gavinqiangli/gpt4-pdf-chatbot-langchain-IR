@@ -28,7 +28,7 @@ export default function Home() {
   }>({
     messages: [
       {
-        message: 'Hi, what would you like to learn about IR?',
+        message: 'Hi, what would you like to learn about companies such as Ericsson, Fortum, Telia, ENN Natural Gas...?',
         type: 'apiMessage',
       },
     ],
@@ -199,12 +199,12 @@ export default function Home() {
     <>
       <div>
         <Head>
-          <title>Chat With IR</title>
-          <meta name="description" content="Checkout our cool intelligent IR agent" key="desc" />
-          <meta property="og:title" content="Chat With IR agent" />
+          <title>Chat With Intelligent agent for investors</title>
+          <meta name="description" content="Checkout our cool intelligent agent for investors" key="desc" />
+          <meta property="og:title" content="Chat With Intelligent agent for investors" />
           <meta
             property="og:description"
-            content="Checkout our cool intelligent IR agent"
+            content="Checkout our cool intelligent agent for investors"
           />
           <meta
             property="og:image"
@@ -215,7 +215,7 @@ export default function Home() {
       <Layout>
         <div className="mx-auto flex flex-col gap-4">
           <h1 className="text-2xl font-bold leading-[1.1] tracking-tighter text-center">
-            Chat With IR agent.
+            Chat With Intelligent Investor agent.
           </h1>
           <h2 className="text-2xl leading-[1.1] tracking-tighter text-center">
             (Apology for mistakes. For demo purpose only).
@@ -317,7 +317,7 @@ export default function Home() {
                     placeholder={
                       loading
                         ? 'Waiting for response...'
-                        : 'Ask me anything about IR...'
+                        : 'Ask me anything about companies such as Ericsson, Fortum, Telia, ENN Natural Gas...'
                     }
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
@@ -402,7 +402,7 @@ export default function Home() {
             </div>
         <footer className="m-auto p-4">
           <a href="https://www.linkedin.com/in/qianglil/">
-            IR agent by Qiang Li. All Rights Reserved.
+            Intelligent Investor agent by Qiang Li. All Rights Reserved.
           </a>
         </footer>
       </Layout>

@@ -151,7 +151,7 @@ def create_index_from_text(docpath):
     name_space = 'web-test'; # namespace is optional for your vectors
 
     # The OpenAI embedding model `text-embedding-ada-002 uses 1536 dimensions`
-    vectorstore = Pinecone.from_documents(docs, embeddings, index_name=index_name, text_key="text", namespace=name_space)
+    vectorstore = Pinecone.from_documents(docs, embeddings, index_name=index_name, name_space=name_space, text_key="text")
 
     index = pinecone.Index(index_name); # change to your own index name
 
@@ -195,35 +195,74 @@ def generate_answer(query, index):
 
 docpath = 'docs/web.txt'
 
+# Function to crawl a website
+def crawl_site(base_url, max_depth=3):
+    visited_urls = set()
+
+    def recursive_crawl(url, depth):
+        if depth > max_depth:
+            return
+
+        if url in visited_urls:
+            return
+
+        visited_urls.add(url)
+        print(f"Succeeded to crawl URL: {url}")   
+
+        try:
+            response = requests.get(url)
+            if response.status_code == 200:
+                soup = BeautifulSoup(response.text, 'html.parser')
+
+                # Process the page content here or extract data
+                # # Find all anchor tags and crawl their href attributes
+                for link in soup.find_all('a'):
+                    next_link = link.get('href')
+                    if next_link is not None and next_link.startswith('/') or next_link.startswith(base_url):
+                        next_url = urljoin(base_url, next_link)
+                        recursive_crawl(next_url, depth + 1)
+        except Exception as e:
+            print(f"Failed to crawl {url}: {e}")
+
+    recursive_crawl(base_url, 0)
+
+    # Iterate through the list of URLs
+    for url in visited_urls:
+        markdown = get_markdown_from_url(url)
+        if markdown:
+            print(f"URL: {url}")   
+            # Open a file in append mode ('a')
+            with open(docpath, 'a', encoding='utf-8') as file:
+                file.write(markdown + '\n\n')
+
+        else:   
+            print(f"Failed to fetch markdown from URL: {url}")
+
+    file.close()
+
+
+# Example usage - specify the website URL to crawl
+website_url = 'https://www.zhongan.com/corporate/announcements/?lang=en'
+base_url = get_base_url(website_url)
+crawl_site(base_url)
+
 # List of URLs to scrape (web.txt)
-urls = [
-    # Ericsson latest news
-    "https://www.ericsson.com/en/newsroom/latest-news?typeFilters=1,2,3,4&locs=68304,39095",
-    "https://www.ericsson.com/en/newsroom/latest-news?typeFilters=1,2,3,4&locs=68304,39095&pageNum=2",
-    "https://www.ericsson.com/en/newsroom/latest-news?typeFilters=1,2,3,4&locs=68304,39095&pageNum=3",
-    "https://www.ericsson.com/en/newsroom/latest-news?typeFilters=1,2,3,4&locs=68304,39095&pageNum=4",
-    "https://www.ericsson.com/en/newsroom/latest-news?typeFilters=1,2,3,4&locs=68304,39095&pageNum=5",
-    
-    # Fortum latest news
-    "https://www.fortum.com/news-and-publications/all-news-and-releases?f2400131=release-type:316,441,6,11&p2400131=5",
+# urls = [
+#     "https://www.zhongan.com/corporate/announcements/?lang=en",
+#     # Add more URLs here
+# ]
 
-    # Telia latest news
-    "https://www.teliacompany.com/en/newsroom?language=en",
+# # Iterate through the list of URLs
+# for url in urls:
+#     markdown = get_markdown_from_url(url)
+#     if markdown:
+#         print(f"URL: {url}")   
+#         # Open a file in append mode ('a')
+#         with open(docpath, 'a', encoding='utf-8') as file:
+#             file.write(markdown + '\n\n')
 
-    # Add more URLs here
-]
-
-# Iterate through the list of URLs
-for url in urls:
-    markdown = get_markdown_from_url(url)
-    if markdown:
-        print(f"URL: {url}")   
-        # Open a file in append mode ('a')
-        with open(docpath, 'a', encoding='utf-8') as file:
-            file.write(markdown + '\n\n')
-
-    else:   
-        print(f"Failed to fetch markdown from URL: {url}")
+#     else:   
+#         print(f"Failed to fetch markdown from URL: {url}")
 
 index = create_index_from_text(docpath) 
 print("scrapeweb ingestion complete")
