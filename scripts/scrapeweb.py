@@ -6,18 +6,13 @@ import json
 import os
 import html2text
 from langchain.chat_models import ChatOpenAI
-from llama_index import Document
-from llama_index.node_parser import SimpleNodeParser
-from llama_index.text_splitter import TokenTextSplitter
 from langchain.prompts import ChatPromptTemplate
-from llama_index import VectorStoreIndex
 import openai
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.vectorstores import Pinecone
 import pinecone
 from langchain.document_loaders import TextLoader
-
 
 
 load_dotenv()
@@ -95,7 +90,6 @@ def get_base_url(url):
 
 
 # Turn relative url to absolute url in html
-
 def convert_to_absolute_url(html, base_url):
     soup = BeautifulSoup(html, 'html.parser')
 
@@ -154,10 +148,10 @@ def create_index_from_text(docpath):
     )
     
     index_name = os.environ.get("PINECONE_INDEX_NAME")
-    # name_space = 'web-test'; # namespace is optional for your vectors
+    name_space = 'web-test'; # namespace is optional for your vectors
 
     # The OpenAI embedding model `text-embedding-ada-002 uses 1536 dimensions`
-    vectorstore = Pinecone.from_documents(docs, embeddings, index_name=index_name, text_key="text")
+    vectorstore = Pinecone.from_documents(docs, embeddings, index_name=index_name, name_space=name_space, text_key="text")
 
     index = pinecone.Index(index_name); # change to your own index name
 
@@ -198,58 +192,78 @@ def generate_answer(query, index):
 
     return response.content
 
-# # List of URLs to scrape (web.txt)
+
+docpath = 'docs/web.txt'
+
+# Function to crawl a website
+def crawl_site(base_url, max_depth=3):
+    visited_urls = set()
+
+    def recursive_crawl(url, depth):
+        if depth > max_depth:
+            return
+
+        if url in visited_urls:
+            return
+
+        visited_urls.add(url)
+        print(f"Succeeded to crawl URL: {url}")   
+
+        try:
+            response = requests.get(url)
+            if response.status_code == 200:
+                soup = BeautifulSoup(response.text, 'html.parser')
+
+                # Process the page content here or extract data
+                # # Find all anchor tags and crawl their href attributes
+                for link in soup.find_all('a'):
+                    next_link = link.get('href')
+                    if next_link is not None and next_link.startswith('/') or next_link.startswith(base_url):
+                        next_url = urljoin(base_url, next_link)
+                        recursive_crawl(next_url, depth + 1)
+        except Exception as e:
+            print(f"Failed to crawl {url}: {e}")
+
+    recursive_crawl(base_url, 0)
+
+    # Iterate through the list of URLs
+    for url in visited_urls:
+        markdown = get_markdown_from_url(url)
+        if markdown:
+            print(f"URL: {url}")   
+            # Open a file in append mode ('a')
+            with open(docpath, 'a', encoding='utf-8') as file:
+                file.write(markdown + '\n\n')
+
+        else:   
+            print(f"Failed to fetch markdown from URL: {url}")
+
+    file.close()
+
+
+# Example usage - specify the website URL to crawl
+website_url = 'https://www.zhongan.com/corporate/announcements/?lang=en'
+base_url = get_base_url(website_url)
+crawl_site(base_url)
+
+# List of URLs to scrape (web.txt)
 # urls = [
-#     "https://transformainsights.com/blog/september-events",
-#     "https://transformainsights.com/iot-platforms",
-#     "https://transformainsights.com/iot-connectivity",
-#     "https://transformainsights.com/mobile-private-networks",
-#     "https://transformainsights.com/low-power-wide-area-networks",
-#     "https://transformainsights.com/5g-iot",
-#     "https://transformainsights.com/digital-transformation",
-#     "https://transformainsights.com/ai-machine-learning",
-#     "https://transformainsights.com/sustainability",
-#     "https://transformainsights.com/edge-computing",
+#     "https://www.zhongan.com/corporate/announcements/?lang=en",
 #     # Add more URLs here
 # ]
 
-# List of URLs to scrape (web2.txt)
-urls = [
-    "https://transformainsights.com/research/forecast/highlights",
-    "https://transformainsights.com/blog/road-connected-by-design",
-    "https://transformainsights.com/blog/why-iot-delivered-managed-service",
-    "https://transformainsights.com/blog/euicc-reach-24-billion-2032",
-    "https://transformainsights.com/blog/global-operator-iot-connections-24-billion",
-    "https://transformainsights.com/blog/6-reasons-device-connectivity-bundling",
-    "https://transformainsights.com/blog/evolving-iot-security-threat-landscape",
-    "https://transformainsights.com/blog/expanding-functionality-iot-cmp",
-    "https://transformainsights.com/blog/iot-cmps-period-transition",
-    "https://transformainsights.com/blog/new-report-ranks-iot-mvnos",
-    "https://transformainsights.com/blog/spin-off-iot-business-unit",
-    "https://transformainsights.com/blog/savings-esim-isim-iot",
-    "https://transformainsights.com/blog/iot-connectivity-feature-not-product",
-    "https://transformainsights.com/blog/enterprise-iot-adopters-favour-platform-off-the-shelf",
-    
-    # Add more URLs here
-]
+# # Iterate through the list of URLs
+# for url in urls:
+#     markdown = get_markdown_from_url(url)
+#     if markdown:
+#         print(f"URL: {url}")   
+#         # Open a file in append mode ('a')
+#         with open(docpath, 'a', encoding='utf-8') as file:
+#             file.write(markdown + '\n\n')
 
-# Iterate through the list of URLs
-#fullmarkdowndoc = ""
-docpath = 'docs/web2.txt'
-for url in urls:
-    markdown = get_markdown_from_url(url)
-    if markdown:
-        print(f"URL: {url}")   
-        #fullmarkdowndoc += markdown 
-        #fullmarkdowndoc += '\n\n'
-        # Open a file in append mode ('a')
-        with open(docpath, 'a', encoding='utf-8') as file:
-            file.write(markdown + '\n\n')
+#     else:   
+#         print(f"Failed to fetch markdown from URL: {url}")
 
-    else:   
-        print(f"Failed to fetch markdown from URL: {url}")
-
-file.close()
 index = create_index_from_text(docpath) 
 print("scrapeweb ingestion complete")
 

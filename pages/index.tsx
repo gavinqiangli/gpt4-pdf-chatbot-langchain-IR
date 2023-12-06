@@ -28,7 +28,7 @@ export default function Home() {
   }>({
     messages: [
       {
-        message: 'Hi, what would you like to learn about IoT?',
+        message: 'Hi, what would you like to learn about IR?',
         type: 'apiMessage',
       },
     ],
@@ -199,26 +199,26 @@ export default function Home() {
     <>
       <div>
         <Head>
-          <title>Chat With IoT</title>
-          <meta name="description" content="Checkout our cool intelligent IoT agent" key="desc" />
-          <meta property="og:title" content="Chat With IoT agent" />
+          <title>Chat With IR</title>
+          <meta name="description" content="Checkout our cool intelligent IR agent" key="desc" />
+          <meta property="og:title" content="Chat With IR agent" />
           <meta
             property="og:description"
-            content="Checkout our cool intelligent IoT agent"
+            content="Checkout our cool intelligent IR agent"
           />
           <meta
             property="og:image"
-            content="https://images.prismic.io//intuzwebsite/5b53bf45-9093-4508-9cd6-81e057dd9b4c_AIoT+Banner.png?w=1200&q=80&auto=format,compress&fm=png8"
+            content="https://replicate.delivery/pbxt/qoTthCMjYZpzB52NXsUF7ThWZbH4bEXJDz63GEcHpqZ440fIA/out-0.png"
           />
         </Head>
       </div>
       <Layout>
         <div className="mx-auto flex flex-col gap-4">
           <h1 className="text-2xl font-bold leading-[1.1] tracking-tighter text-center">
-            Chat With IoT agent.
+            Chat With IR agent.
           </h1>
           <h2 className="text-2xl leading-[1.1] tracking-tighter text-center">
-            (Apology for mistakes as I am only trained on small public data sets and not fine-tuned).
+            (Apology for mistakes. For demo purpose only).
           </h2> 
           <main className={styles.main}>
             <div className={styles.cloud}>
@@ -317,7 +317,7 @@ export default function Home() {
                     placeholder={
                       loading
                         ? 'Waiting for response...'
-                        : 'Ask me anything about IoT...'
+                        : 'Ask me anything about IR...'
                     }
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
@@ -354,7 +354,7 @@ export default function Home() {
           </main>
         </div>
         <h2 className="text-2xl leading-[1.1] tracking-tighter text-center">
-            Do you have better answer, or any comments and feedback?
+            Do you have better answer, comments or feedback?
         </h2> 
         <div className={styles.center}>              
               <div className={styles.cloudform}>
@@ -402,7 +402,7 @@ export default function Home() {
             </div>
         <footer className="m-auto p-4">
           <a href="https://www.linkedin.com/in/qianglil/">
-            IoT agent by Qiang Li. All Rights Reserved.
+            IR agent by Qiang Li. All Rights Reserved.
           </a>
         </footer>
       </Layout>
