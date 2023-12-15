@@ -28,7 +28,7 @@ export default function Home() {
   }>({
     messages: [
       {
-        message: 'Hi, what would you like to learn about companies such as Ericsson, Fortum, Telia, ENN Natural Gas...?',
+        message: 'Hi, what would you like to learn about companies such as Ericsson, Telia, China Telecom, Fortum, ENN Natural Gas...?',
         type: 'apiMessage',
       },
     ],
@@ -317,7 +317,7 @@ export default function Home() {
                     placeholder={
                       loading
                         ? 'Waiting for response...'
-                        : 'Ask me anything about companies such as Ericsson, Fortum, Telia, ENN Natural Gas...'
+                        : 'Ask me anything about companies such as Ericsson, Telia, China Telecom, Fortum, ENN Natural Gas...'
                     }
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
